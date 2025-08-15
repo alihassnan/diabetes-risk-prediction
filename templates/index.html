@@ -1,0 +1,461 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Multi-Step Landing</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+  }
+
+  body, html {
+    height: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  body { flex-direction: column; }
+
+  .container, .loading-screen, .form-screen {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  /* --- FIRST SCREEN --- */
+  .container {
+    text-align: center;
+    background-color: #000;
+    padding: 40px 20px;
+    border-radius: 12px;
+    max-width: 450px;
+    width: 90%;
+    margin: auto;
+  }
+  .logo {
+    max-width: 500px;
+    width: 100%;
+    height: auto;
+    margin: 0 auto -60px auto;
+    opacity: 0;
+    animation: fadeIn 3s forwards;
+  }
+  @keyframes fadeIn { to { opacity: 1; } }
+  .loading-container {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(255,255,255,0.2);
+    border-radius: 4px;
+    overflow: hidden;
+    opacity: 0;
+    animation: fadeIn 3s forwards;
+    transition: opacity 0.5s ease;
+  }
+  .hide-loading { opacity: 0; height: 0; overflow: hidden; transition: all 0.6s ease; }
+  .loading-bar {
+    width: 0%;
+    height: 100%;
+    background-color: #fff;
+    animation: load 3s forwards;
+    animation-delay: 3s;
+  }
+  @keyframes load { to { width: 100%; } }
+  .start-btn {
+    padding: 5px 20px;
+    font-size: 18px;
+    font-weight: 600;
+    color: black;
+    background-color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(20px);
+    transition: 0.5s ease;
+  }
+  .show-btn { opacity: 1; pointer-events: auto; transform: translateY(0); }
+  .start-btn:hover { background-color: #d0d3ff; }
+
+  /* --- SECOND SCREEN --- */
+  .loading-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background-color: black;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    z-index: 999;
+  }
+  .loading-screen img {
+    width: 120px;
+    animation: pulse 1s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.1); opacity: 0.8; }
+  }
+  .spinner {
+    margin-top: 20px;
+    width: 40px;
+    height: 40px;
+    border: 4px solid rgba(255,255,255,0.3);
+    border-top: 4px solid white;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* --- FORM SCREENS --- */
+  .form-screen {
+    display: none;
+    text-align: center;
+    color: white;
+    padding: 20px;
+  }
+  .form-screen input, .form-screen select {
+    padding: 10px;
+    font-size: 16px;
+    margin: 10px 0;
+    width: 80%;
+    border-radius: 5px;
+    border: none;
+  }
+  .form-screen button {
+    padding: 5px 30px;
+    font-size: 16px;
+    font-weight: 600;
+    background-color: White;
+    color: Black;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  .form-screen button:disabled {
+    background-color: gray;
+    cursor: not-allowed;
+  }
+  .form-screen button:hover:enabled {
+    background-color: #d0d3ff;
+  }
+
+  /* --- FOOTER --- */
+  .footer {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    color: white;
+    text-align: center;
+    padding: 8px 5px;
+    font-size: 12px;
+    backdrop-filter: blur(5px);
+  }
+
+/* --- FOURTH SCREEN SPLIT LAYOUT (Full-size Image) --- */
+.health-split {
+  display: flex;
+  align-items: stretch;        /* image + form same height */
+  justify-content: center;
+  max-width: 1200px;
+  width: 100%;
+  margin: auto;
+  background: black;           /* matches theme */
+  flex-wrap: wrap;             /* allow wrapping on smaller screens */
+}
+
+/* LEFT COLUMN: FORM */
+.health-form-col {
+  flex: 0 0 350px;              /* fixed width on desktop */
+  max-width: 100%;              /* so it fits smaller screens */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  background-color: rgba(255,255,255,0.05);
+  border-radius: 12px;
+  box-sizing: border-box;
+  margin-left: 70px;            /* pushes form to the right on desktop */
+}
+
+.health-form-col h2 {
+  text-align: center;
+  margin-bottom: -8px;
+  color: white;
+}
+
+.health-form-col input {
+  padding: 12px;
+  font-size: 16px;
+  margin: 8px 0;
+  width: 100%;
+  border-radius: 5px;
+  border: none;
+}
+
+.health-form-col button {
+  margin-top: 12px;
+  padding: 12px;
+  font-size: 18px;
+  font-weight: 600;
+  background-color: white;
+  color: black;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.health-form-col button:hover {
+  background-color: #d0d3ff;
+}
+
+/* RIGHT COLUMN: BIG TEXT */
+.health-image-col {
+  flex: 1;
+  display: flex;
+  justify-content: flex-start; /* align text to left side of the column */
+  align-items: center;         /* keep it vertically centered */
+  padding-left: 60px;          /* push the text further right */
+}
+
+.big-text {
+  font-size: 3rem;
+  font-weight: 700;
+  color: white;
+  line-height: 1.2;
+  text-align: left;            /* keep lines aligned nicely */
+}
+
+/* Responsive: Stack vertically on small screens */
+@media (max-width: 992px) {
+  .health-split {
+    flex-direction: column;     /* stack form and text */
+    align-items: center;
+    padding: 20px;
+  }
+
+  .health-form-col {
+    margin-left: 0;             /* remove desktop shift */
+    max-width: 500px;           /* limit form width on smaller screens */
+    width: 100%;
+    margin-bottom: 20px;        /* space between form and text */
+  }
+
+  .health-image-col {
+    justify-content: center;    /* center text on smaller screens */
+    padding-left: 0;
+    text-align: center;
+  }
+
+  .big-text {
+    font-size: 2rem;
+    text-align: center;
+  }
+}
+
+
+
+/* Mobile view: stack vertically */
+@media (max-width: 768px) {
+  .health-split {
+    flex-direction: column;
+  }
+}
+
+
+
+</style>
+</head>
+<body>
+
+<!-- FIRST SCREEN -->
+<div class="container" id="firstScreen">
+  <img src="https://i.ibb.co/W4fcBCwW/Navy-Blue-Modern-Diabetes-Care-Logo.png" alt="Logo" class="logo">
+  <div class="loading-container" id="loadingContainer">
+    <div class="loading-bar"></div>
+  </div>
+  <button class="start-btn" id="startBtn">Start Now</button>
+</div>
+
+<!-- SECOND SCREEN -->
+<div class="loading-screen" id="secondScreen">
+  <img src="https://cdn-icons-png.flaticon.com/512/2966/2966484.png" alt="Injection Logo">
+  <div class="spinner"></div>
+</div>
+
+<!-- THIRD SCREEN -->
+<div class="form-screen" id="thirdScreen">
+  <h2>Enter Your Details</h2>
+  <input type="text" placeholder="Your Name" id="nameInput">
+  <select id="genderSelect">
+    <option value="">Select Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select><br>
+  <button id="submitBtn" disabled>Next</button>
+</div>
+
+<!-- FOURTH SCREEN -->
+<div class="form-screen" id="fourthScreen">
+
+
+  <div class="health-split">
+    <!-- LEFT: FORM -->
+
+    <div class="health-form-col">
+      <h2>Health Details</h2>
+      <input type="number" placeholder="Pregnancies">
+      <input type="number" placeholder="Glucose">
+      <input type="number" placeholder="BloodPressure">
+      <input type="number" placeholder="SkinThickness">
+      <input type="number" placeholder="Insulin">
+      <input type="number" placeholder="BMI">
+      <input type="number" placeholder="DiabetesPedigreeFunction">
+      <input type="number" placeholder="Age"><br>
+      <button id="predictBtn">Predict</button>
+    </div>
+
+    <!-- RIGHT: SINGLE BIG IMAGE -->
+    <div class="health-image-col">
+        <h1 class="big-text">Don’t let diabetes surprise you.
+Be informed. Be prepared.</h1>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="form-screen" id="resultScreen">
+  <h2>Prediction Result</h2>
+  <p id="resultMessage" style="font-size:1.2rem; margin-top:10px;"></p>
+  <button onclick="goBack()">Check Again</button>
+</div>
+
+
+<!-- FOOTER -->
+<div class="footer">
+  &copy; 2025 | Developed by Ali Hassnan, Abdullah Noor, Tuba Sabir | Version 1.0
+</div>
+
+<script>
+  // Hide loading bar after complete
+  setTimeout(() => {
+    document.getElementById('loadingContainer').classList.add('hide-loading');
+  }, 6000);
+  setTimeout(() => {
+    document.getElementById('startBtn').classList.add('show-btn');
+  }, 6500);
+
+  // Page 1 → Page 2
+  document.getElementById('startBtn').addEventListener('click', () => {
+    document.getElementById('firstScreen').style.display = 'none';
+    document.getElementById('secondScreen').style.display = 'flex';
+    setTimeout(() => {
+      document.getElementById('secondScreen').style.display = 'none';
+      document.getElementById('thirdScreen').style.display = 'block';
+    }, 1000);
+  });
+
+  // Enable Next on Page 3 only if filled
+  const nameInput = document.getElementById('nameInput');
+  const genderSelect = document.getElementById('genderSelect');
+  const submitBtn = document.getElementById('submitBtn');
+  function validateForm() {
+    submitBtn.disabled = !(nameInput.value.trim() && genderSelect.value);
+  }
+  nameInput.addEventListener('input', validateForm);
+  genderSelect.addEventListener('change', validateForm);
+
+  // Page 3 → Loading → Page 4
+  submitBtn.addEventListener('click', () => {
+    document.getElementById('thirdScreen').style.display = 'none';
+    document.getElementById('secondScreen').style.display = 'flex';
+    setTimeout(() => {
+      document.getElementById('secondScreen').style.display = 'none';
+      document.getElementById('fourthScreen').style.display = 'block';
+    }, 1000);
+  });
+
+// Gender-based form field toggle
+genderSelect.addEventListener('change', () => {
+  const pregnancyField = document.querySelector('#fourthScreen input[placeholder="Pregnancies"]');
+
+  if (genderSelect.value === 'male') {
+    pregnancyField.style.visibility = 'hidden';
+    pregnancyField.style.height = '0';
+    pregnancyField.style.margin = '0';
+  } else if (genderSelect.value === 'female') {
+    pregnancyField.style.visibility = 'visible';
+    pregnancyField.style.height = '';
+    pregnancyField.style.margin = '';
+  } else {
+    pregnancyField.style.visibility = 'hidden';
+    pregnancyField.style.height = '0';
+    pregnancyField.style.margin = '0';
+  }
+});
+
+const predictBtn = document.getElementById("predictBtn");
+
+predictBtn.addEventListener("click", async () => {
+    // Get values from form
+    const pregnancies = parseFloat(document.querySelector('#fourthScreen input[placeholder="Pregnancies"]').value) || 0;
+    const glucose = parseFloat(document.querySelector('#fourthScreen input[placeholder="Glucose"]').value) || 0;
+    const bloodPressure = parseFloat(document.querySelector('#fourthScreen input[placeholder="BloodPressure"]').value) || 0;
+    const skinThickness = parseFloat(document.querySelector('#fourthScreen input[placeholder="SkinThickness"]').value) || 0;
+    const insulin = parseFloat(document.querySelector('#fourthScreen input[placeholder="Insulin"]').value) || 0;
+    const bmi = parseFloat(document.querySelector('#fourthScreen input[placeholder="BMI"]').value) || 0;
+    const dpf = parseFloat(document.querySelector('#fourthScreen input[placeholder="DiabetesPedigreeFunction"]').value) || 0;
+    const age = parseFloat(document.querySelector('#fourthScreen input[placeholder="Age"]').value) || 0;
+
+    // Show loading
+    document.getElementById("secondScreen").style.display = "flex";
+    document.getElementById("fourthScreen").style.display = "none";
+
+    // Call backend
+  const response = await fetch("/predict", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+        Pregnancies: pregnancies,
+        Glucose: glucose,
+        BloodPressure: bloodPressure,
+        SkinThickness: skinThickness,
+        Insulin: insulin,
+        BMI: bmi,
+        DiabetesPedigreeFunction: dpf,
+        Age: age
+    })
+});
+
+
+
+
+    const result = await response.json();
+
+    // Hide loading
+    document.getElementById("secondScreen").style.display = "none";
+    document.getElementById("fourthScreen").style.display = "block";
+
+    // Show prediction alert
+    if(result.prediction === 1){
+        alert("High Risk of Diabetes! Please consult a doctor.");
+    } else {
+        alert("Low Risk of Diabetes! Keep a healthy lifestyle.");
+    }
+});
+
+
+</script>
+
+</body>
+</html>
+
